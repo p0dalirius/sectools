@@ -115,7 +115,7 @@ if __name__ == '__main__':
             if not os.path.exists(os.path.dirname(options.output)):
                 os.makedirs(os.path.dirname(options.output), exist_ok=True)
         f = open(options.output, 'w')
-        f.write(json.dumps(found, indent=4))
+        f.write(json.dumps(found, indent=4)+"\n")
         f.close()
     else:
         print("[!] Data is None. Cannot continue.")

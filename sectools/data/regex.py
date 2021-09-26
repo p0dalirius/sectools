@@ -11,7 +11,7 @@ regex_email_b = bytes(regex_email, "UTF-8")
 regex_domain = r'(([a-zA-Z0-9]+\.)?([a-zA-Z0-9]+\.[a-zA-Z0-9]+))'
 regex_domain_b = bytes(regex_domain, "UTF-8")
 
-regex_url = r'((http|https|ftp)://[a-zA-Z0-9]+\.[a-zA-Z0-9]+([:][0-9]+)?(/[a-zA-Z0-9_]+)+([/])?)'
+regex_url = r'((http|https|ftp)://[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+([:][0-9]+)?(/[a-zA-Z0-9_\-\.]+)+([/])?)'
 regex_url_b = bytes(regex_url, "UTF-8")
 
 regex_ipv4 = r'(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
