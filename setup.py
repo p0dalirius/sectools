@@ -6,8 +6,7 @@
 
 import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+long_description = "A Python native library containing lots of useful functions to write efficient scripts to hack stuff."
 
 setuptools.setup(
     name="sectools",
