@@ -6,7 +6,7 @@
 [![PyPI - License](https://img.shields.io/pypi/l/sectools?color=gree)](../LICENSE.md)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sectools)
 ![PyPI](https://img.shields.io/pypi/v/sectools)
-[![Build Status](https://travis-ci.com/p0dalirius/sectools.svg?branch=main)](https://travis-ci.com/p0dalirius/pydsinternals)
+[![Build Status](https://travis-ci.com/p0dalirius/sectools.svg?branch=main)](https://travis-ci.com/p0dalirius/sectools)
 
 A Python native library containing lots of useful functions to write efficient scripts to hack stuff.
 
