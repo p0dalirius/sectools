@@ -5,7 +5,7 @@
 # Date created       : 28 Jul 2022
 
 import re
-from sectools.data.regex import regex_ipv4
+from sectools.data.regex import regex_ipv4, regex_ipv4_cidr, regex_ipv6
 
 
 def is_ipv4_cidr(target) -> bool:
