@@ -1,7 +1,7 @@
 ![](./.github/banner.png)
 </br></br>
 
-# sectools - The Offensive Python Security Toolbox 
+# sectools - The Offensive Security Python Toolbox 
 
 [![PyPI - License](https://img.shields.io/pypi/l/sectools?color=gree)](../LICENSE.md)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sectools)
