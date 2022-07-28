@@ -1,17 +1,16 @@
 .PHONY : all clean build upload
 
-BASEDIR=./sectools
-
-all: install
+all: install clean
 
 clean:
 	@rm -rf `find ./ -type d -name "*__pycache__"`
 	@rm -rf ./build/ ./dist/ ./sectools.egg-info/
 
-install:
+install: build
 	python3 setup.py install
+
 build:
 	python3 setup.py sdist bdist_wheel
 
-upload:
-	python3 setup.py sdist upload
+upload: build
+	twine upload dist/*
