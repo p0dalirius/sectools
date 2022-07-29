@@ -36,7 +36,12 @@ def expand_cidr(cidr):
     if is_ipv4_cidr(cidr):
         matched = re.match("^" + regex_ipv4_cidr + "$", cidr.strip())
         network_ip = matched.groups()[0]
+        network_ip_int = ipv4_str_to_int(network_ip)
         bits_mask = int(matched.groups()[-1])
+        # Applying bitmask
+        network_ip_int = (network_ip_int >> (32 - bits_mask)) << (32 - bits_mask)
+        addresses = [ipv4_int_to_str(network_ip_int + k) for k in range(2 ** (32-bits_mask))]
+        return addresses
     else:
         print("[!] Invalid CIDR '%s'" % cidr)
         return []
@@ -47,7 +52,7 @@ def expand_cidr(cidr):
 
 def ipv4_str_to_hex_str(ipv4) -> str:
     a, b, c, d = map(int, ipv4.split('.'))
-    hexip = hex(a)[2:].rjust(2,'0')
+    hexip = hex(a)[2:].rjust(2, '0')
     hexip += hex(b)[2:].rjust(2, '0')
     hexip += hex(c)[2:].rjust(2, '0')
     hexip += hex(d)[2:].rjust(2, '0')
@@ -61,4 +66,12 @@ def ipv4_str_to_raw_bytes(ipv4) -> bytes:
 
 def ipv4_str_to_int(ipv4) -> bytes:
     a, b, c, d = map(int, ipv4.split('.'))
-    return (a<<24) + (b<<16) + (c<<8) + d
+    return (a << 24) + (b << 16) + (c << 8) + d
+
+
+def ipv4_int_to_str(ipv4) -> str:
+    a = (ipv4 >> 24) & 0xff
+    b = (ipv4 >> 16) & 0xff
+    c = (ipv4 >> 8) & 0xff
+    d = (ipv4 >> 0) & 0xff
+    return "%d.%d.%d.%d" % (a, b, c, d)
