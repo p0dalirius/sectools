@@ -74,7 +74,9 @@ def expand_port_range(port_range):
             stop = int(stop)
             if 0 <= start <= 65535 and 0 <= stop <= 65535:
                 ports = list(range(start, stop + 1))
-        print(start, sep, stop)
+        elif start is None and sep is not None and stop is None:
+            # Port range from 0 to 65535
+            ports = list(range(0, 65535 + 1))
     return ports
 
 
