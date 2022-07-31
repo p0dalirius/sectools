@@ -5,26 +5,12 @@
 # Date created       : 30 Jul 2022
 
 
+from sectools.windows.crypto import parse_lm_nt_hashes
 import binascii
 import ldap3
 import logging
 import os
 import ssl
-
-
-def get_machine_name(auth_domain, auth_dc_ip):
-    if auth_dc_ip is not None:
-        s = SMBConnection(auth_dc_ip, auth_dc_ip)
-    else:
-        s = SMBConnection(auth_domain, auth_domain)
-    try:
-        s.login('', '')
-    except Exception:
-        if s.getServerName() == '':
-            raise Exception('Error while anonymous logging into %s' % auth_domain)
-    else:
-        s.logoff()
-    return s.getServerName()
 
 
 def __init_ldap_connection(target, tls_version, dc_ip, domain, username, password, lmhash, nthash, use_ldaps=False, auth_key=None):
@@ -90,6 +76,8 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
 
 def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes):
 
+    auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
+
     ldap_server, ldap_session = init_ldap_session(
         auth_domain=auth_domain,
         auth_dc_ip=auth_dc_ip,
@@ -97,7 +85,6 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
         auth_password=auth_password,
         auth_lm_hash=auth_lm_hash,
         auth_nt_hash=auth_nt_hash,
-        use_kerberos=False,
         use_ldaps=False
     )
 
