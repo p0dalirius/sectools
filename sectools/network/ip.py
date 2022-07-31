@@ -47,6 +47,38 @@ def expand_cidr(cidr):
         return []
 
 
+def expand_port_range(port_range):
+    port_range = port_range.strip()
+    ports = []
+    matched = re.match('([0-9]+)?(-)?([0-9]+)?', port_range)
+    if matched is not None:
+        start, sep, stop = matched.groups()
+        if start is not None and (sep is None and stop is None):
+            # Single port
+            start = int(start)
+            if 0 <= start <= 65535:
+                ports = [start]
+        elif (start is not None and sep is not None) and stop is None:
+            # Port range from start to 65535
+            start = int(start)
+            if 0 <= start <= 65535:
+                ports = list(range(start, 65535+1))
+        elif start is None and (sep is not None and stop is not None):
+            # Port range from 0 to stop
+            stop = int(stop)
+            if 0 <= stop <= 65535:
+                ports = list(range(0, stop + 1))
+        elif start is not None and sep is not None and stop is not None:
+            # Port range from start to stop
+            start = int(start)
+            stop = int(stop)
+            if 0 <= start <= 65535 and 0 <= stop <= 65535:
+                ports = list(range(start, stop + 1))
+        print(start, sep, stop)
+    return ports
+
+
+
 # IP conversion functions
 
 
