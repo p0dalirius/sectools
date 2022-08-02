@@ -91,8 +91,8 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
 
     computers = []
     target_dn = ldap_server.info.other["defaultNamingContext"]
-    ldap_session.search(target_dn, "(objectCategory=computer)", attributes=["dNSHostName"])
-    for entry in ldap_session.response:
+    results = list(ldap_session.extend.standard.paged_search(target_dn, "(objectCategory=computer)", attributes=["dNSHostName"]))
+    for entry in results:
         if entry['type'] != 'searchResEntry':
             continue
         dNSHostName = entry["attributes"]['dNSHostName']
