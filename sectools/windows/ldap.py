@@ -106,3 +106,37 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
     print("[+] Found %d computers in the domain." % len(computers))
 
     return computers
+
+
+def get_servers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes):
+    auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
+
+    ldap_server, ldap_session = init_ldap_session(
+        auth_domain=auth_domain,
+        auth_dc_ip=auth_dc_ip,
+        auth_username=auth_username,
+        auth_password=auth_password,
+        auth_lm_hash=auth_lm_hash,
+        auth_nt_hash=auth_nt_hash,
+        use_ldaps=False
+    )
+
+    print("[>] Extracting all servers ...")
+
+    servers = []
+    target_dn = ldap_server.info.other["defaultNamingContext"]
+    results = list(ldap_session.extend.standard.paged_search(target_dn, "(&(objectCategory=computer)(operatingSystem=*Server*))",attributes=["dNSHostName"]))
+    for entry in results:
+        if entry['type'] != 'searchResEntry':
+            continue
+        dNSHostName = entry["attributes"]['dNSHostName']
+        if type(dNSHostName) == str:
+            servers.append(dNSHostName)
+        if type(dNSHostName) == list:
+            if len(dNSHostName) != 0:
+                for entry in dNSHostName:
+                    servers.append(entry)
+
+    print("[+] Found %d servers in the domain." % len(servers))
+
+    return servers
