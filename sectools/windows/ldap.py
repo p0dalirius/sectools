@@ -96,7 +96,13 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
     for entry in ldap_session.response:
         if entry['type'] != 'searchResEntry':
             continue
-        computers.append(entry["attributes"]['dNSHostName'])
+        dNSHostName = entry["attributes"]['dNSHostName']
+        if type(dNSHostName) == str:
+            computers.append(dNSHostName)
+        if type(dNSHostName) == list:
+            if len(dNSHostName) != 0:
+                for entry in dNSHostName:
+                    computers.append(entry)
 
     print("[+] Found %d computers in the domain." % len(computers))
 
