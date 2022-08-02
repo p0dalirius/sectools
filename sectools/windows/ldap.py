@@ -75,7 +75,6 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
 
 
 def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes):
-
     auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
 
     ldap_server, ldap_session = init_ldap_session(
