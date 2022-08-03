@@ -13,7 +13,7 @@ with open('requirements.txt', 'r', encoding='utf-8') as f:
 
 setuptools.setup(
     name="sectools",
-    version="1.3.4",
+    version="1.3.5",
     description="",
     url="https://github.com/p0dalirius/sectools",
     author="Podalirius",

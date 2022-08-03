@@ -140,3 +140,27 @@ def get_servers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passwor
     print("[+] Found %d servers in the domain." % len(servers))
 
     return servers
+
+
+def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, query, attributes=['*']):
+    auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
+
+    ldap_server, ldap_session = init_ldap_session(
+        auth_domain=auth_domain,
+        auth_dc_ip=auth_dc_ip,
+        auth_username=auth_username,
+        auth_password=auth_password,
+        auth_lm_hash=auth_lm_hash,
+        auth_nt_hash=auth_nt_hash,
+        use_ldaps=False
+    )
+
+    target_dn = ldap_server.info.other["defaultNamingContext"]
+    ldapresults = list(ldap_session.extend.standard.paged_search(target_dn, query, attributes=attributes))
+    results = {}
+    for entry in ldapresults:
+        if entry['type'] != 'searchResEntry':
+            continue
+        print(entry)
+        results[entry['dn']] = entry["attributes"]
+    return results
