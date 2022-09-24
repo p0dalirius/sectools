@@ -74,7 +74,7 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
         )
 
 
-def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes):
+def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, use_ldaps=False):
     auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
 
     ldap_server, ldap_session = init_ldap_session(
@@ -84,7 +84,7 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
         auth_password=auth_password,
         auth_lm_hash=auth_lm_hash,
         auth_nt_hash=auth_nt_hash,
-        use_ldaps=False
+        use_ldaps=use_ldaps
     )
 
     print("[>] Extracting all computers ...")
@@ -108,7 +108,7 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
     return computers
 
 
-def get_servers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes):
+def get_servers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, use_ldaps=False):
     auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
 
     ldap_server, ldap_session = init_ldap_session(
@@ -118,7 +118,7 @@ def get_servers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passwor
         auth_password=auth_password,
         auth_lm_hash=auth_lm_hash,
         auth_nt_hash=auth_nt_hash,
-        use_ldaps=False
+        use_ldaps=use_ldaps
     )
 
     print("[>] Extracting all servers ...")
@@ -157,10 +157,11 @@ def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_h
 
     target_dn = ldap_server.info.other["defaultNamingContext"]
     ldapresults = list(ldap_session.extend.standard.paged_search(target_dn, query, attributes=attributes))
+
     results = {}
     for entry in ldapresults:
         if entry['type'] != 'searchResEntry':
             continue
-        print(entry)
         results[entry['dn']] = entry["attributes"]
+
     return results
