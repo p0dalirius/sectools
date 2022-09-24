@@ -19,3 +19,6 @@ python3 -m pip install sectools
 ## Contributing
 
 Pull requests are welcome. Feel free to open an issue if you want to add other features.
+
+## References
+ - https://pypi.org/project/sectools/
