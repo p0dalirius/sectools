@@ -189,7 +189,7 @@ def get_subnets(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hash
     return subnets
 
 
-def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, query, attributes=['*']):
+def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, query, attributes=['*'], target_dn=None):
     auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
 
     ldap_server, ldap_session = init_ldap_session(
@@ -201,8 +201,10 @@ def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_h
         auth_nt_hash=auth_nt_hash,
         use_ldaps=False
     )
-
-    target_dn = ldap_server.info.other["defaultNamingContext"]
+    
+    if target_dn is None:
+        target_dn = ldap_server.info.other["defaultNamingContext"]
+    
     ldapresults = list(ldap_session.extend.standard.paged_search(target_dn, query, attributes=attributes))
 
     results = {}
