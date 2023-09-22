@@ -91,8 +91,8 @@ def get_computers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passw
         print("[>] Extracting all computers ...")
 
     computers = []
-    target_dn = ldap_server.info.other["defaultNamingContext"]
-    results = list(ldap_session.extend.standard.paged_search(target_dn, "(objectCategory=computer)", attributes=["dNSHostName"]))
+    searchbase = ldap_server.info.other["defaultNamingContext"]
+    results = list(ldap_session.extend.standard.paged_search(searchbase, "(objectCategory=computer)", attributes=["dNSHostName"]))
     for entry in results:
         if entry['type'] != 'searchResEntry':
             continue
@@ -127,8 +127,8 @@ def get_servers_from_domain(auth_domain, auth_dc_ip, auth_username, auth_passwor
         print("[>] Extracting all servers ...")
 
     servers = []
-    target_dn = ldap_server.info.other["defaultNamingContext"]
-    results = list(ldap_session.extend.standard.paged_search(target_dn, "(&(objectCategory=computer)(operatingSystem=*Server*))",attributes=["dNSHostName"]))
+    searchbase = ldap_server.info.other["defaultNamingContext"]
+    results = list(ldap_session.extend.standard.paged_search(searchbase, "(&(objectCategory=computer)(operatingSystem=*Server*))",attributes=["dNSHostName"]))
     for entry in results:
         if entry['type'] != 'searchResEntry':
             continue
@@ -163,8 +163,8 @@ def get_subnets(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hash
         print("[>] Extracting all subnets ...")
 
     subnets = []
-    target_dn = ldap_server.info.other["configurationNamingContext"]
-    results = list(ldap_session.extend.standard.paged_search(target_dn, "(objectClass=site)",attributes=['distinguishedName', 'name', 'description']))
+    searchbase = ldap_server.info.other["configurationNamingContext"]
+    results = list(ldap_session.extend.standard.paged_search(searchbase, "(objectClass=site)",attributes=['distinguishedName', 'name', 'description']))
     sites = []
     for entry in results:
         if entry['type'] != 'searchResEntry':
@@ -189,7 +189,7 @@ def get_subnets(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hash
     return subnets
 
 
-def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, query, attributes=['*'], target_dn=None):
+def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, query, attributes=['*'], searchbase=None):
     auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
 
     ldap_server, ldap_session = init_ldap_session(
@@ -202,10 +202,10 @@ def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_h
         use_ldaps=False
     )
     
-    if target_dn is None:
-        target_dn = ldap_server.info.other["defaultNamingContext"]
+    if searchbase is None:
+        searchbase = ldap_server.info.other["defaultNamingContext"]
     
-    ldapresults = list(ldap_session.extend.standard.paged_search(target_dn, query, attributes=attributes))
+    ldapresults = list(ldap_session.extend.standard.paged_search(searchbase, query, attributes=attributes))
 
     results = {}
     for entry in ldapresults:
