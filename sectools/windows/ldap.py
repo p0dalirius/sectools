@@ -329,7 +329,7 @@ def get_subnets(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hash
     return subnets
 
 
-def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, auth_key=None, query, attributes=['*'], searchbase=None, use_kerberos=False, kdcHost=None, use_ldaps=False):
+def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_hashes, query, auth_key=None, attributes=['*'], searchbase=None, use_kerberos=False, kdcHost=None, use_ldaps=False):
     auth_lm_hash, auth_nt_hash = parse_lm_nt_hashes(auth_hashes)
 
     ldap_server, ldap_session = init_ldap_session(
