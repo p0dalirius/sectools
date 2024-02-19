@@ -130,7 +130,7 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
     return True
 
 
-def __init_ldap_connection(target, tls_version, dc_ip, domain, username, password, lmhash, nthash, aeskey=None, kerberos=False, kdcHost=None):
+def __init_ldap_connection(target, tls_version, domain, username, password, lmhash, nthash, aeskey=None, kerberos=False, kdcHost=None):
     user = '%s\\%s' % (domain, username)
     if tls_version is not None:
         use_ssl = True
@@ -199,7 +199,6 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
             return __init_ldap_connection(
                 target=target_dc,
                 tls_version=ssl.PROTOCOL_TLSv1_2,
-                dc_ip=auth_dc_ip,
                 domain=auth_domain,
                 username=auth_username,
                 password=auth_password,
@@ -213,7 +212,6 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
             return __init_ldap_connection(
                 target=target_dc,
                 tls_version=ssl.PROTOCOL_TLSv1,
-                dc_ip=auth_dc_ip,
                 domain=auth_domain,
                 username=auth_username,
                 password=auth_password,
@@ -227,7 +225,6 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
         return __init_ldap_connection(
             target=target_dc,
             tls_version=None,
-            dc_ip=auth_dc_ip,
             domain=auth_domain,
             username=auth_username,
             password=auth_password,
