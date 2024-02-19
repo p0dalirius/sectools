@@ -129,30 +129,64 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
 
     return True
 
+
 def __init_ldap_connection(target, tls_version, dc_ip, domain, username, password, lmhash, nthash, aeskey=None, kerberos=False, kdcHost=None):
     user = '%s\\%s' % (domain, username)
     if tls_version is not None:
         use_ssl = True
         port = 636
-        tls = ldap3.Tls(validate=ssl.CERT_NONE, version=tls_version, ciphers='ALL:@SECLEVEL=0')
+        tls = ldap3.Tls(
+            validate=ssl.CERT_NONE,
+            version=tls_version,
+            ciphers='ALL:@SECLEVEL=0'
+        )
     else:
         use_ssl = False
         port = 389
         tls = None
-    ldap_server = ldap3.Server(target, get_info=ldap3.ALL, port=port, use_ssl=use_ssl, tls=tls)
+    ldap_server = ldap3.Server(
+        host=target,
+        port=port,
+        use_ssl=use_ssl,
+        get_info=ldap3.ALL,
+        tls=tls
+    )
 
     if kerberos:
-        ldap_session = ldap3.Connection(ldap_server)
+        ldap_session = ldap3.Connection(server=ldap_server)
         ldap_session.bind()
-        ldap3_kerberos_login(ldap_session, target, username, password, domain, lmhash, nthash, aeskey, kdcHost)
+        ldap3_kerberos_login(
+            connection=ldap_session, 
+            target=target, 
+            user=username, 
+            password=password, 
+            domain=domain, 
+            lmhash=lmhash, 
+            nthash=nthash, 
+            aeskey=aeskey, 
+            kdcHost=kdcHost
+        )
     elif len(nthash) != 0:
         if len(lmhash) == 0:
             lmhash = "aad3b435b51404eeaad3b435b51404ee"
-        ldap_session = ldap3.Connection(ldap_server, user=user, password=lmhash + ":" + nthash, authentication=ldap3.NTLM, auto_bind=True)
+        ldap_session = ldap3.Connection(
+            server=ldap_server, 
+            user=user, 
+            password=lmhash + ":" + nthash, 
+            authentication=ldap3.NTLM, 
+            auto_bind=True
+        )
     else:
-        ldap_session = ldap3.Connection(ldap_server, user=user, password=password, authentication=ldap3.NTLM, auto_bind=True)
+        ldap_session = ldap3.Connection(
+            server=ldap_server, 
+            user=user, 
+            password=password, 
+            authentication=ldap3.NTLM, 
+            auto_bind=True
+        )
 
     return ldap_server, ldap_session
+
 
 def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, auth_lm_hash, auth_nt_hash, auth_key=None, use_kerberos=False, kdcHost=None, use_ldaps=False):
     if use_kerberos:
