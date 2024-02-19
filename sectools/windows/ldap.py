@@ -166,11 +166,13 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
             aeskey=aeskey, 
             kdcHost=kdcHost
         )
-    elif len(nthash) != 0:
-        if len(lmhash) == 0:
+    elif any([nthash is not None, len(nthash) != 0, lmhash is not None, len(lmhash) != 0]):
+        if any([lmhash is None, len(lmhash) == 0]):
             lmhash = "aad3b435b51404eeaad3b435b51404ee"
+        if any([nthash is None, len(lmhash) == 0]):
+            nthash = "31d6cfe0d16ae931b73c59d7e0c089c0"
         ldap_session = ldap3.Connection(
-            server=ldap_server, 
+            server=ldap_server,
             user=user, 
             password=lmhash + ":" + nthash, 
             authentication=ldap3.NTLM, 
