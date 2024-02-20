@@ -166,7 +166,7 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
             aeskey=aeskey, 
             kdcHost=kdcHost
         )
-    elif any([nthash is not None, len(nthash) != 0, lmhash is not None, len(lmhash) != 0]):
+    elif any([len(nthash) != 0, len(lmhash) != 0]):
         if any([lmhash is None, len(lmhash) == 0]):
             lmhash = "aad3b435b51404eeaad3b435b51404ee"
         if any([nthash is None, len(lmhash) == 0]):
