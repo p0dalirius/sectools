@@ -131,7 +131,13 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
 
 
 def __init_ldap_connection(target, tls_version, domain, username, password, lmhash, nthash, aeskey=None, kerberos=False, kdcHost=None):
-    user = '%s\\%s' % (domain, username)
+    DEBUG = False
+
+    if nthash is None:
+        nthash = ""
+    if lmhash is None:
+        lmhash = ""
+
     if tls_version is not None:
         use_ssl = True
         port = 636
@@ -153,35 +159,41 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
     )
 
     if kerberos:
+        if DEBUG:
+            print("[%s] Using Kerberos authentication" % __name__)
         ldap_session = ldap3.Connection(server=ldap_server)
         ldap_session.bind()
         ldap3_kerberos_login(
-            connection=ldap_session, 
-            target=target, 
-            user=username, 
-            password=password, 
-            domain=domain, 
-            lmhash=lmhash, 
-            nthash=nthash, 
-            aeskey=aeskey, 
+            connection=ldap_session,
+            target=target,
+            user=username,
+            password=password,
+            domain=domain,
+            lmhash=lmhash,
+            nthash=nthash,
+            aeskey=aeskey,
             kdcHost=kdcHost
         )
     elif any([len(nthash) != 0, len(lmhash) != 0]):
-        if any([lmhash is None, len(lmhash) == 0]):
+        if DEBUG:
+            print("[%s] Using Pass the Hash authentication" % __name__)
+        if (len(lmhash) == 0):
             lmhash = "aad3b435b51404eeaad3b435b51404ee"
-        if any([nthash is None, len(lmhash) == 0]):
+        if (len(nthash) == 0):
             nthash = "31d6cfe0d16ae931b73c59d7e0c089c0"
         ldap_session = ldap3.Connection(
             server=ldap_server,
-            user=user, 
+            user='%s\\%s' % (domain, username), 
             password=lmhash + ":" + nthash, 
             authentication=ldap3.NTLM, 
             auto_bind=True
         )
     else:
+        if DEBUG:
+            print("[%s] Using user/password authentication" % __name__)
         ldap_session = ldap3.Connection(
             server=ldap_server, 
-            user=user, 
+            user='%s\\%s' % (domain, username), 
             password=password, 
             authentication=ldap3.NTLM, 
             auto_bind=True
