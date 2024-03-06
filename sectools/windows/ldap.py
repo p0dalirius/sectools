@@ -171,7 +171,7 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
             domain=domain,
             lmhash=lmhash,
             nthash=nthash,
-            aeskey=aeskey,
+            aesKey=aeskey,
             kdcHost=kdcHost
         )
     elif any([len(nthash) != 0, len(lmhash) != 0]):
