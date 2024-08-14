@@ -130,7 +130,7 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
     return True
 
 
-def __init_ldap_connection(target, tls_version, domain, username, password, lmhash, nthash, aeskey=None, kerberos=False, kdcHost=None):
+def __init_ldap_connection(target, tls_version, domain, username, password, lmhash, nthash, aesKey=None, kerberos=False, kdcHost=None):
     DEBUG = False
 
     if nthash is None:
@@ -171,7 +171,7 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
             domain=domain,
             lmhash=lmhash,
             nthash=nthash,
-            aesKey=aeskey,
+            aesKey=aesKey,
             kdcHost=kdcHost
         )
     elif any([len(nthash) != 0, len(lmhash) != 0]):
@@ -181,24 +181,73 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
             lmhash = "aad3b435b51404eeaad3b435b51404ee"
         if (len(nthash) == 0):
             nthash = "31d6cfe0d16ae931b73c59d7e0c089c0"
-        ldap_session = ldap3.Connection(
-            server=ldap_server,
-            user='%s\\%s' % (domain, username), 
-            password=lmhash + ":" + nthash, 
-            authentication=ldap3.NTLM, 
-            auto_bind=True
-        )
+        try: 
+            ldap_session = ldap3.Connection(
+                server=ldap_server,
+                user='%s\\%s' % (domain, username), 
+                password=lmhash + ":" + nthash, 
+                authentication=ldap3.NTLM, 
+                auto_bind=True
+            )
+        except ldap3.core.exceptions.LDAPBindError as e:
+            if "strongerAuthRequired" in str(e): # to handle ldap signing on port 389
+                if DEBUG:
+                    print("[%s] Trying to handle LDAP signing" % __name__)
+                ldap_session = ldap3.Connection(
+                    server=ldap_server, 
+                    user='%s\\%s' % (domain, username), 
+                    password=lmhash + ":" + nthash,
+                    authentication=ldap3.NTLM, 
+                    auto_bind=True,
+                    session_security='ENCRYPT'
+                )
+            elif port == 636 and "invalidCredentials" in str(e): # to handle channel binding on port 636 (Exception is not different from truly invalid credentials...)
+                if DEBUG:
+                    print("[%s] Trying to handle channel binding" % __name__)
+                ldap_session = ldap3.Connection(
+                server=ldap_server, 
+                user='%s\\%s' % (domain, username), 
+                password=lmhash + ":" + nthash,
+                authentication=ldap3.NTLM, 
+                auto_bind=True,
+                channel_binding=ldap3.TLS_CHANNEL_BINDING
+            )
+    
     else:
         if DEBUG:
             print("[%s] Using user/password authentication" % __name__)
-        ldap_session = ldap3.Connection(
-            server=ldap_server, 
-            user='%s\\%s' % (domain, username), 
-            password=password, 
-            authentication=ldap3.NTLM, 
-            auto_bind=True
-        )
-
+        try:
+            ldap_session = ldap3.Connection(
+                server=ldap_server, 
+                user='%s\\%s' % (domain, username), 
+                password=password, 
+                authentication=ldap3.NTLM, 
+                auto_bind=True
+            )
+        except ldap3.core.exceptions.LDAPBindError as e:
+            if "strongerAuthRequired" in str(e): # to handle ldap signing on port 389
+                if DEBUG:
+                    print("[%s] Trying to handle LDAP signing" % __name__)
+                ldap_session = ldap3.Connection(
+                    server=ldap_server, 
+                    user='%s\\%s' % (domain, username), 
+                    password=password, 
+                    authentication=ldap3.NTLM, 
+                    auto_bind=True,
+                    session_security='ENCRYPT'
+                )
+            elif port == 636 and "invalidCredentials" in str(e): # to handle channel binding on port 636 (Exception is not different from truly invalid credentials...)
+                if DEBUG:
+                    print("[%s] Trying to handle channel binding" % __name__)
+                ldap_session = ldap3.Connection(
+                server=ldap_server, 
+                user='%s\\%s' % (domain, username), 
+                password=password, 
+                authentication=ldap3.NTLM, 
+                auto_bind=True,
+                channel_binding=ldap3.TLS_CHANNEL_BINDING
+            )
+    
     return ldap_server, ldap_session
 
 
@@ -218,7 +267,7 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
                 password=auth_password,
                 lmhash=auth_lm_hash,
                 nthash=auth_nt_hash,
-                aeskey=auth_key,
+                aesKey=auth_key,
                 kdcHost=kdcHost,
                 kerberos=use_kerberos
             )
@@ -231,7 +280,7 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
                 password=auth_password,
                 lmhash=auth_lm_hash,
                 nthash=auth_nt_hash,
-                aeskey=auth_key,
+                aesKey=auth_key,
                 kdcHost=kdcHost,
                 kerberos=use_kerberos
             )
@@ -244,7 +293,7 @@ def init_ldap_session(auth_domain, auth_dc_ip, auth_username, auth_password, aut
             password=auth_password,
             lmhash=auth_lm_hash,
             nthash=auth_nt_hash,
-            aeskey=auth_key,
+            aesKey=auth_key,
             kdcHost=kdcHost,
             kerberos=use_kerberos
         )
