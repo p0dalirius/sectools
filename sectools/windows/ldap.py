@@ -6,15 +6,11 @@
 
 
 from sectools.windows.crypto import parse_lm_nt_hashes
-import binascii
 import ldap3
-import logging
-import os
 import ssl
 
 
-def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='', nthash='', aesKey='', kdcHost=None,
-                         TGT=None, TGS=None, useCache=True):
+def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='', nthash='', aesKey='', kdcHost=None, TGT=None, TGS=None, useCache=True):
     from pyasn1.codec.ber import encoder, decoder
     from pyasn1.type.univ import noValue
     """
@@ -40,13 +36,13 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
     from impacket.krb5.types import Principal, KerberosTime, Ticket
     from impacket.spnego import SPNEGO_NegTokenInit, TypesMech
     import datetime
-
-    if TGT is not None or TGS is not None or aesKey is not None:
+    
+    if TGT is not None or TGS is not None:
         useCache = False
 
-    target = 'ldap/%s' % target
+    targetName = 'ldap/%s' % target
     if useCache:
-        domain, user, TGT, TGS = CCache.parseFile(domain, user, target)
+        domain, user, TGT, TGS = CCache.parseFile(domain, user, targetName)
 
     # First of all, we need to get a TGT for the user
     userName = Principal(user, type=constants.PrincipalNameType.NT_PRINCIPAL.value)
@@ -60,15 +56,21 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
         sessionKey = TGT['sessionKey']
 
     if TGS is None:
-        serverName = Principal(target, type=constants.PrincipalNameType.NT_SRV_INST.value)
-        tgs, cipher, oldSessionKey, sessionKey = getKerberosTGS(serverName, domain, kdcHost, tgt, cipher,
-                                                                sessionKey)
+        serverName = Principal(targetName, type=constants.PrincipalNameType.NT_SRV_INST.value)
+        tgs, cipher, oldSessionKey, sessionKey = getKerberosTGS(
+            serverName, 
+            domain,
+            kdcHost, 
+            tgt, 
+            cipher,
+            sessionKey
+        )
     else:
         tgs = TGS['KDC_REP']
         cipher = TGS['cipher']
         sessionKey = TGS['sessionKey']
 
-        # Let's build a NegTokenInit with a Kerberos REQ_AP
+    # Let's build a NegTokenInit with a Kerberos REQ_AP
 
     blob = SPNEGO_NegTokenInit()
 
@@ -112,8 +114,14 @@ def ldap3_kerberos_login(connection, target, user, password, domain='', lmhash='
 
     blob['MechToken'] = encoder.encode(apReq)
 
-    request = ldap3.operation.bind.bind_operation(connection.version, ldap3.SASL, user, None, 'GSS-SPNEGO',
-                                                  blob.getData())
+    request = ldap3.operation.bind.bind_operation(
+        connection.version,
+        ldap3.SASL,
+        user,
+        None,
+        'GSS-SPNEGO',
+        blob.getData()
+    )
 
     # Done with the Kerberos saga, now let's get into LDAP
     if connection.closed:  # try to open connection if closed
@@ -161,8 +169,18 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
     if kerberos:
         if DEBUG:
             print("[%s] Using Kerberos authentication" % __name__)
+            print("   | target", target)
+            print("   | username", username)
+            print("   | password", password)
+            print("   | domain", domain)
+            print("   | lmhash", lmhash)
+            print("   | nthash", nthash)
+            print("   | aesKey", aesKey)
+            print("   | kdcHost", kdcHost)
+
         ldap_session = ldap3.Connection(server=ldap_server)
         ldap_session.bind()
+
         ldap3_kerberos_login(
             connection=ldap_session,
             target=target,
@@ -174,6 +192,7 @@ def __init_ldap_connection(target, tls_version, domain, username, password, lmha
             aesKey=aesKey,
             kdcHost=kdcHost
         )
+        
     elif any([len(nthash) != 0, len(lmhash) != 0]):
         if DEBUG:
             print("[%s] Using Pass the Hash authentication" % __name__)
