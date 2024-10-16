@@ -13,7 +13,7 @@ with open('requirements.txt', 'r', encoding='utf-8') as f:
 
 setuptools.setup(
     name="sectools",
-    version="1.4.3",
+    version="1.4.4",
     description="",
     url="https://github.com/p0dalirius/sectools",
     author="Podalirius",
@@ -29,6 +29,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.11',
     install_requires=requirements,
 )
