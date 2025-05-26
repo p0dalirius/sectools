@@ -460,8 +460,9 @@ def raw_ldap_query(auth_domain, auth_dc_ip, auth_username, auth_password, auth_h
     
     if searchbase is None:
         searchbase = ldap_server.info.other["defaultNamingContext"]
-    
-    ldapresults = list(ldap_session.extend.standard.paged_search(searchbase, query, attributes=attributes))
+
+    controls = ldap3.protocol.microsoft.security_descriptor_control(sdflags=0x04)
+    ldapresults = list(ldap_session.extend.standard.paged_search(searchbase, query, attributes=attributes, controls=controls))
 
     results = {}
     for entry in ldapresults:
