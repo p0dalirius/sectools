@@ -27,18 +27,18 @@ jobs:
 
     - name: Run all tests
       run: |
-        cd bhopengraph/tests
+        cd sectools/tests
         python run_tests.py
 
     - name: Run tests with verbose output
       run: |
-        cd bhopengraph/tests
+        cd sectools/tests
         python -m unittest discover -v
 
     - name: Run tests with coverage
       run: |
         pip install coverage
-        coverage run --source=bhopengraph bhopengraph/tests/run_tests.py
+        coverage run --source=sectools sectools/tests/run_tests.py
         coverage report
 
   build-package:
@@ -66,5 +66,5 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: bhopengraph-package
+        name: sectools-package
         path: dist/
