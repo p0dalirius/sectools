@@ -6,15 +6,16 @@
 
 import setuptools
 
-long_description = """"""
+long_description = """
+"""
 
 with open('requirements.txt', 'r', encoding='utf-8') as f:
     requirements = [x.strip() for x in f.readlines()]
 
 setuptools.setup(
     name="sectools",
-    version="1.4.4",
-    description="",
+    version="1.5.0",
+    description="A python library containing the base functions for security tools",
     url="https://github.com/p0dalirius/sectools",
     author="Podalirius",
     long_description=long_description,
