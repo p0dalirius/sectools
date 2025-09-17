@@ -22,7 +22,7 @@ class Markdown(object):
     @classmethod
     def fromFile(cls, path_to_file):
         if os.path.exists(path_to_file):
-            f = open(path_to_file, 'r')
+            f = open(path_to_file, "r")
             self = cls(data=f.read())
             f.close()
             return self
@@ -37,7 +37,9 @@ class Markdown(object):
     def extract_links(self):
         found = []
         if self.data is not None:
-            for match in re.findall(r'[^!](\[([^\]]*)\]\(([^)]*)\))|(^\[([^\]]*)\]\(([^)]*)\))', self.data):
+            for match in re.findall(
+                r"[^!](\[([^\]]*)\]\(([^)]*)\))|(^\[([^\]]*)\]\(([^)]*)\))", self.data
+            ):
                 if len(match[0]) != 0:
                     md_format, text, link = match[:3]
                     found.append({"markdown": md_format, "text": text, "link": link})
@@ -49,7 +51,7 @@ class Markdown(object):
     def extract_images(self):
         found = []
         if self.data is not None:
-            for match in re.findall(r'(!\[([^\]]*)\]\(([^)]*)\))', self.data):
+            for match in re.findall(r"(!\[([^\]]*)\]\(([^)]*)\))", self.data):
                 md_format, text, link = match
                 found.append({"markdown": md_format, "text": text, "link": link})
         return found
