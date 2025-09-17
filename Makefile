@@ -1,6 +1,6 @@
 .PHONY : all clean build upload test test-verbose test-coverage lint lint-fix fix
 
-PROJECTNAME := "sectools"
+PROJECTNAME := sectools
 
 all: install clean
 
@@ -24,11 +24,11 @@ install: build
 build:
 	python3 -m pip uninstall $(PROJECTNAME) --yes --break-system-packages
 	python3 -m pip install build --break-system-packages
-	python3 -m build --wheel
+	python3 -m build
 
-upload: build
-	python3 -m pip install twine --break-system-packages
-	python3 -m twine upload dist/*
+upload: uninstall clean build
+	python3 -m pip install twine setuptools packaging --upgrade --break-system-packages
+	python3 -m twine upload dist/*.whl dist/*.tar.gz
 
 test:
 	@echo "[$(shell date)] Running tests ..."
