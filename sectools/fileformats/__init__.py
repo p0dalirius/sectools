@@ -5,3 +5,5 @@
 # Date created       : 6 Nov 2022
 
 from .Markdown import Markdown
+
+__all__ = ["Markdown"]
