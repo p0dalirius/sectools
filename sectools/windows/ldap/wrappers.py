@@ -6,7 +6,7 @@
 
 
 from sectools.windows.crypto import parse_lm_nt_hashes
-from sectools.windows.ldap import init_ldap_session
+from sectools.windows.ldap.ldap import init_ldap_session
 
 
 def get_computers_from_domain(
