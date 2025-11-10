@@ -14,7 +14,7 @@ with open('requirements.txt', 'r', encoding='utf-8') as f:
 
 setuptools.setup(
     name="sectools",
-    version="1.5.0",
+    version="1.5.1",
     description="A python library containing the base functions for security tools",
     url="https://github.com/p0dalirius/sectools",
     author="Podalirius",
